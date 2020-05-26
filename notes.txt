@@ -1,0 +1,28 @@
+//...for reverse engineering...//
+
+Scaffold-DbContext "Server=DESKTOP-UAHGMSV;Initial Catalog=BookStores_DEV;User ID=sa;Password=bd2005SQL;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
+
+
+//...keep the connection string in appsettings.json file and do reverse enginnering this way...//
+
+Scaffold-DbContext -Connection Name=BookStoreDB Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -force
+.........note: need to add "-force" command to override at the end ............
+
+
+//add a package to plurize dbsets name
+package name: Bricelam.EntityFrameworkCore.Plura....
+
+..note: install the package and run command of reverse engineering like above..
+
+
+
+//....to get a list of table data into another table as list need to install following packakge..//
+	 
+Microsoft.AspNetCore.Mvc.NewtonsoftJson 
+
+.....and also add below code in startup.cs file.....
+
+services.AddControllersWithViews()
+    .AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
