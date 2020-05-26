@@ -42,6 +42,9 @@ namespace BookStoresWebAPI
             services.AddDbContext<BookStores_DEVContext>(option =>
                 option.UseSqlServer(Configuration.GetConnectionString("BookStoreDB"))
             );
+
+            var jwtSection = Configuration.GetSection("JwtSettings");
+            services.Configure<JwtSettings>(jwtSection);
            
         }
 

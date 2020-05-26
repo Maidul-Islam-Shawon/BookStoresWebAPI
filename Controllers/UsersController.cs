@@ -7,19 +7,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookStoresWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 
 namespace BookStoresWebAPI.Controllers
 {
-    [Authorize]
+    
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly BookStores_DEVContext _context;
+        private readonly JwtSettings _jwtSettings;
 
-        public UsersController(BookStores_DEVContext context)
+        public UsersController(BookStores_DEVContext context, IOptions<JwtSettings> jwtSettings)
         {
             _context = context;
+            _jwtSettings = jwtSettings.Value;
         }
 
         // GET: api/Users
@@ -43,11 +46,35 @@ namespace BookStoresWebAPI.Controllers
             return user;
         }
 
+        //GET: api/Users by email and password
+       [HttpGet("login")]
+        public async Task<ActionResult<User>> Login([FromBody]User user)
+        {
+            user = await _context.Users.Include(u => u.Pub)
+                                    .Where(u=>u.EmailAddress == user.EmailAddress
+                                            && u.Password == user.Password)
+                                    .FirstOrDefaultAsync();
+
+            UserWithToken userWithToken = new UserWithToken(user);
+
+            if (userWithToken == null)
+            {
+                return NotFound();
+            }
+
+            return userWithToken;
+        }
+
         // GET: api/Users by email and password
         [HttpGet("GetUser")]
-        public async Task<ActionResult<User>> GetUser(string email, string password)
+        public async Task<ActionResult<User>> GetUser()
         {
-            var user = await _context.Users.Where(usr => usr.EmailAddress == email && usr.Password == password).FirstOrDefaultAsync();
+            string emailAddress = HttpContext.User.Identity.Name;
+
+            var user = await _context.Users.Where(usr => usr.EmailAddress == emailAddress)
+                                                .FirstOrDefaultAsync();
+           
+            user.Password = null;
 
             if (user == null)
             {
