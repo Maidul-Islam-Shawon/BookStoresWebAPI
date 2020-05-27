@@ -7,12 +7,7 @@ namespace BookStoresWebAPI.Models
 {
     public class UserWithToken:User
     {
-        public UserWithToken()
-        {
-
-        }
-        
-        public UserWithToken(User _user)
+       0 public UserWithToken(User _user)
         {
             user = _user;
         }
