@@ -7,13 +7,23 @@ namespace BookStoresWebAPI.Models
 {
     public class UserWithToken:User
     {
-       0 public UserWithToken(User _user)
+       public string Token { get; set; }
+
+        public UserWithToken(User user)
         {
-            user = _user;
+            this.UserId = user.UserId;
+            this.EmailAddress = user.EmailAddress;
+            this.Password = user.Password;
+            this.FirstName = user.FirstName;
+            this.MiddleName = user.MiddleName;
+            this.LastName = user.LastName;
+            this.PubId = user.PubId;
+            this.HireDate = user.HireDate;
+
+            this.Role = user.Role;
         }
 
-        public User user { get; set; }
-        public string Token { get; set; }
+        
    
 
     }

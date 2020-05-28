@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using BookStoresWebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace BookStoresWebAPI.Controllers
 {
@@ -61,6 +65,21 @@ namespace BookStoresWebAPI.Controllers
             {
                 return NotFound();
             }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.EmailAddress)
+                }),
+                Expires = DateTime.UtcNow.AddMonths(6),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            userWithToken.Token = tokenHandler.WriteToken(token);
 
             return userWithToken;
         }
